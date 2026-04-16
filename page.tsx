@@ -1,34 +1,34 @@
 "use client";
 import { useEffect, useState } from "react";
 
-type Purchase = {
+type Sale = {
   id: number;
   product_id: number;
-  supplier_name: string;
+  customer_name: string;
   quantity: number;
-  purchase_price: number;
+  sale_price: number;
   total_price: number;
 };
 
-export default function PurchasePage() {
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
+export default function SalesPage() {
+  const [sales, setSales] = useState<Sale[]>([]);
   const [message, setMessage] = useState<string>("");
 
   const [form, setForm] = useState({
     product_id: "",
-    supplier_name: "",
+    customer_name: "",
     quantity: "",
-    purchase_price: "",
+    sale_price: "",
   });
 
-  const fetchPurchases = async () => {
-    const res = await fetch("http://127.0.0.1:8000/purchase/");
+  const fetchSales = async () => {
+    const res = await fetch("http://127.0.0.1:8000/sales/");
     const data = await res.json();
-    setPurchases(data.data);
+    setSales(data.data);
   };
 
   useEffect(() => {
-    fetchPurchases();
+    fetchSales();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,82 +38,82 @@ export default function PurchasePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await fetch("http://127.0.0.1:8000/purchase/", {
+    await fetch("http://127.0.0.1:8000/sales/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         product_id: Number(form.product_id),
-        supplier_name: form.supplier_name,
+        customer_name: form.customer_name,
         quantity: Number(form.quantity),
-        purchase_price: Number(form.purchase_price),
+        sale_price: Number(form.sale_price),
       }),
     });
 
-    setMessage("✅ Purchase Added Successfully!");
+    setMessage("💰 Sale Added Successfully!");
     setTimeout(() => setMessage(""), 2000);
 
     setForm({
       product_id: "",
-      supplier_name: "",
+      customer_name: "",
       quantity: "",
-      purchase_price: "",
+      sale_price: "",
     });
 
-    fetchPurchases();
+    fetchSales();
   };
 
-  const deletePurchase = async (id: number) => {
-    await fetch(`http://127.0.0.1:8000/purchase/${id}`, {
+  const deleteSale = async (id: number) => {
+    await fetch(`http://127.0.0.1:8000/sales/${id}`, {
       method: "DELETE",
     });
 
-    setMessage("🗑️ Purchase Deleted!");
+    setMessage("🗑️ Sale Deleted!");
     setTimeout(() => setMessage(""), 2000);
 
-    fetchPurchases();
+    fetchSales();
   };
 
-  const updatePurchase = async (item: Purchase) => {
+  const updateSale = async (item: Sale) => {
     const quantity = prompt("Enter new quantity:", String(item.quantity));
-    const price = prompt("Enter new price:", String(item.purchase_price));
+    const price = prompt("Enter new price:", String(item.sale_price));
 
     if (!quantity || !price) return;
 
-    await fetch(`http://127.0.0.1:8000/purchase/${item.id}`, {
+    await fetch(`http://127.0.0.1:8000/sales/${item.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         product_id: item.product_id,
-        supplier_name: item.supplier_name,
+        customer_name: item.customer_name,
         quantity: Number(quantity),
-        purchase_price: Number(price),
+        sale_price: Number(price),
       }),
     });
 
-    setMessage("✏️ Purchase Updated!");
+    setMessage("✏️ Sale Updated!");
     setTimeout(() => setMessage(""), 2000);
 
-    fetchPurchases();
+    fetchSales();
   };
 
   return (
     <div style={container}>
       {/* HEADER */}
       <div style={header}>
-        <h1 style={title}>📦 Purchase Management</h1>
-        <p style={subtitle}>Manage your purchases efficiently</p>
+        <h1 style={title}>📊 Sales Management</h1>
+        <p style={subtitle}>Track and manage your sales efficiently</p>
       </div>
 
-      {/* MESSAGE */}
+      {/* TOAST */}
       {message && <div style={toast}>{message}</div>}
 
       {/* FORM */}
       <div style={card}>
-        <h2 style={cardTitle}>Add Purchase</h2>
+        <h2 style={cardTitle}>Add Sale</h2>
 
         <form onSubmit={handleSubmit} style={formStyle}>
           <input
@@ -125,9 +125,9 @@ export default function PurchasePage() {
             style={inputStyle}
           />
           <input
-            name="supplier_name"
-            placeholder="Supplier Name"
-            value={form.supplier_name}
+            name="customer_name"
+            placeholder="Customer Name"
+            value={form.customer_name}
             onChange={handleChange}
             required
             style={inputStyle}
@@ -141,9 +141,9 @@ export default function PurchasePage() {
             style={inputStyle}
           />
           <input
-            name="purchase_price"
+            name="sale_price"
             placeholder="Price"
-            value={form.purchase_price}
+            value={form.sale_price}
             onChange={handleChange}
             required
             style={inputStyle}
@@ -157,14 +157,14 @@ export default function PurchasePage() {
 
       {/* TABLE */}
       <div style={card}>
-        <h2 style={cardTitle}>Purchase List</h2>
+        <h2 style={cardTitle}>Sales List</h2>
 
         <table style={table}>
           <thead>
             <tr style={theadRow}>
               <th style={thtd}>ID</th>
               <th style={thtd}>Product</th>
-              <th style={thtd}>Supplier</th>
+              <th style={thtd}>Customer</th>
               <th style={thtd}>Qty</th>
               <th style={thtd}>Price</th>
               <th style={thtd}>Total</th>
@@ -173,29 +173,26 @@ export default function PurchasePage() {
           </thead>
 
           <tbody>
-            {purchases.map((item, index) => (
+            {sales.map((item, index) => (
               <tr
                 key={item.id}
                 style={{
-                  background: index % 2 === 0 ? "#f9fafb" : "#ffffff",
+                  background: index % 2 === 0 ? "#f0f9ff" : "#ffffff",
                 }}
               >
                 <td style={thtd}>{item.id}</td>
                 <td style={thtd}>{item.product_id}</td>
-                <td style={thtd}>{item.supplier_name}</td>
+                <td style={thtd}>{item.customer_name}</td>
                 <td style={thtd}>{item.quantity}</td>
-                <td style={thtd}>{item.purchase_price}</td>
+                <td style={thtd}>{item.sale_price}</td>
                 <td style={thtd}>{item.total_price}</td>
                 <td style={thtd}>
-                  <button
-                    style={editButton}
-                    onClick={() => updatePurchase(item)}
-                  >
+                  <button style={editButton} onClick={() => updateSale(item)}>
                     Edit
                   </button>
                   <button
                     style={deleteButton}
-                    onClick={() => deletePurchase(item.id)}
+                    onClick={() => deleteSale(item.id)}
                   >
                     Delete
                   </button>
@@ -214,7 +211,7 @@ export default function PurchasePage() {
 const container = {
   minHeight: "100vh",
   padding: "40px 20px",
-  background: "linear-gradient(to right, #e0e7ff, #f8fafc)",
+  background: "linear-gradient(to right, #e0f2fe, #f0f9ff)",
   fontFamily: "Segoe UI, sans-serif",
 };
 
@@ -234,7 +231,7 @@ const subtitle = {
 
 const toast = {
   textAlign: "center" as const,
-  background: "#22c55e",
+  background: "#0ea5e9",
   color: "white",
   padding: "10px",
   borderRadius: "8px",
@@ -272,7 +269,7 @@ const inputStyle = {
 
 const addButton = {
   padding: "10px 20px",
-  background: "linear-gradient(45deg, #22c55e, #16a34a)",
+  background: "linear-gradient(45deg, #0ea5e9, #0284c7)",
   color: "white",
   border: "none",
   borderRadius: "8px",
@@ -286,7 +283,7 @@ const table = {
 };
 
 const theadRow = {
-  background: "#c7d2fe",
+  background: "#bae6fd",
 };
 
 const thtd = {
@@ -297,7 +294,7 @@ const thtd = {
 const editButton = {
   marginRight: "5px",
   padding: "6px 12px",
-  background: "#3b82f6",
+  background: "#2563eb",
   color: "white",
   border: "none",
   borderRadius: "6px",
